@@ -78,6 +78,8 @@ public:
 
     Camera MainCamera;
 
+    GLuint newMeshVAO;
+
     void Init();
 };
 

@@ -7,6 +7,8 @@
 #define FLYTHROUGH_CAMERA_IMPLEMENTATION
 #include "flythrough_camera.h"
 
+#include "preamble.glsl"
+
 #include <glm/gtc/type_ptr.hpp>
 
 #include <SDL2/SDL.h>
@@ -15,55 +17,47 @@ void Simulation::Init(Scene* scene)
 {
     mScene = scene;
 
-    std::vector<uint32_t> loadedMeshIDs;
+    float newVertices[4][3]  = {
+        {-10.0, 0.0, -10.0}, 
+        {10.0, 0.0, -10.0}, 
+        {10.0, 0.0, 10.0}, 
+        {-10.0, 0.0, 10.0}
+    };
 
-    loadedMeshIDs.clear();
-    LoadMeshesFromFile(mScene, "assets/cube/cube.obj", &loadedMeshIDs);
-    for (uint32_t loadedMeshID : loadedMeshIDs)
-    {
-        uint32_t newInstanceID;
-        AddMeshInstance(mScene, loadedMeshID, &newInstanceID);
+    int newIndices[6] = {
+        0, 1, 2, 
+        0, 2, 3
+    };
 
-        // scale up the cube
-        uint32_t newTransformID = scene->Instances[newInstanceID].TransformID;
-        scene->Transforms[newTransformID].Scale = glm::vec3(2.0f);
-    }
+    GLuint newPositionBO;
+    glGenBuffers(1, &newPositionBO);
+    glBindBuffer(GL_ARRAY_BUFFER, newPositionBO);
+    glBufferData(GL_ARRAY_BUFFER, 4 * 3 * sizeof(float), newVertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    loadedMeshIDs.clear();
-    LoadMeshesFromFile(mScene, "assets/teapot/teapot.obj", &loadedMeshIDs);
-    for (uint32_t loadedMeshID : loadedMeshIDs)
-    {
-        // place a teapot on top of the cube
-        {
-            uint32_t newInstanceID;
-            AddMeshInstance(mScene, loadedMeshID, &newInstanceID);
-            uint32_t newTransformID = scene->Instances[newInstanceID].TransformID;
-            scene->Transforms[newTransformID].Translation += glm::vec3(0.0f, 2.0f, 0.0f);
-        }
+    GLuint newIndexBO;
+    glGenBuffers(1, &newIndexBO);
+    // Why not bind to GL_ELEMENT_ARRAY_BUFFER?
+    // Because binding to GL_ELEMENT_ARRAY_BUFFER attaches the EBO to the currently bound VAO, which might stomp somebody else's state.
+    glBindBuffer(GL_ARRAY_BUFFER, newIndexBO);
+    glBufferData(GL_ARRAY_BUFFER, 2 * 3 * sizeof(int), newIndices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        // place a teapot on the side
-        {
-            uint32_t newInstanceID;
-            AddMeshInstance(mScene, loadedMeshID, &newInstanceID);
-            uint32_t newTransformID = scene->Instances[newInstanceID].TransformID;
-            scene->Transforms[newTransformID].Translation += glm::vec3(3.0f, 1.0f, 4.0f);
-        }
+    // Hook up VAO
+    GLuint newMeshVAO;
+    glGenVertexArrays(1, &newMeshVAO);
 
-        // place another teapot on the side
-        {
-            uint32_t newInstanceID;
-            AddMeshInstance(mScene, loadedMeshID, &newInstanceID);
-            uint32_t newTransformID = scene->Instances[newInstanceID].TransformID;
-            scene->Transforms[newTransformID].Translation += glm::vec3(3.0f, 1.0f, -4.0f);
-        }
-    }
+    glBindVertexArray(newMeshVAO);
 
-    loadedMeshIDs.clear();
-    LoadMeshesFromFile(mScene, "assets/floor/floor.obj", &loadedMeshIDs);
-    for (uint32_t loadedMeshID : loadedMeshIDs)
-    {
-        AddMeshInstance(mScene, loadedMeshID, nullptr);
-    }
+    glBindBuffer(GL_ARRAY_BUFFER, newPositionBO);
+    glVertexAttribPointer(SCENE_POSITION_ATTRIB_LOCATION, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glEnableVertexAttribArray(SCENE_POSITION_ATTRIB_LOCATION);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newIndexBO);
+
+    mScene->newMeshVAO = newMeshVAO;
 
     Camera mainCamera;
     mainCamera.Eye = glm::vec3(5.0f);

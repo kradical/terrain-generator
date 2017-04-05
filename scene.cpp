@@ -7,6 +7,8 @@
 
 #include <map>
 
+#include <iostream>
+
 void Scene::Init()
 {
     // Need to specify size up front. These numbers are pretty arbitrary.
@@ -129,143 +131,57 @@ void LoadMeshesFromFile(
 
         Mesh newMesh;
 
-        newMesh.Name = shapeToAdd.name;
 
-        newMesh.IndexCount = (GLuint)meshToAdd.indices.size();
-        newMesh.VertexCount = (GLuint)meshToAdd.positions.size() / 3;
+        float newVertices[4][3]  = {
+            {-10.0, 0.0, -10.0}, 
+            {10.0, 0.0, -10.0}, 
+            {10.0, 0.0, 10.0}, 
+            {-10.0, 0.0, 10.0}
+        };
 
-        if (meshToAdd.positions.empty())
-        {
-            // should never happen
-            newMesh.PositionBO = 0;
-        }
-        else
-        {
-            GLuint newPositionBO;
-            glGenBuffers(1, &newPositionBO);
-            glBindBuffer(GL_ARRAY_BUFFER, newPositionBO);
-            glBufferData(GL_ARRAY_BUFFER, meshToAdd.positions.size() * sizeof(meshToAdd.positions[0]), meshToAdd.positions.data(), GL_STATIC_DRAW);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
+        int newIndices[6] = {
+            0, 1, 2, 
+            0, 2, 3
+        };
 
-            newMesh.PositionBO = newPositionBO;
-        }
+        GLuint newPositionBO;
+        glGenBuffers(1, &newPositionBO);
+        glBindBuffer(GL_ARRAY_BUFFER, newPositionBO);
+        glBufferData(GL_ARRAY_BUFFER, 4 * 3 * sizeof(float), newVertices, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        if (meshToAdd.texcoords.empty())
-        {
-            newMesh.TexCoordBO = 0;
-        }
-        else
-        {
-            GLuint newTexCoordBO;
-            glGenBuffers(1, &newTexCoordBO);
-            glBindBuffer(GL_ARRAY_BUFFER, newTexCoordBO);
-            glBufferData(GL_ARRAY_BUFFER, meshToAdd.texcoords.size() * sizeof(meshToAdd.texcoords[0]), meshToAdd.texcoords.data(), GL_STATIC_DRAW);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
+        newMesh.PositionBO = newPositionBO;
 
-            newMesh.TexCoordBO = newTexCoordBO;
-        }
 
-        if (meshToAdd.normals.empty())
-        {
-            newMesh.NormalBO = 0;
-        }
-        else
-        {
-            GLuint newNormalBO;
-            glGenBuffers(1, &newNormalBO);
-            glBindBuffer(GL_ARRAY_BUFFER, newNormalBO);
-            glBufferData(GL_ARRAY_BUFFER, meshToAdd.normals.size() * sizeof(meshToAdd.normals[0]), meshToAdd.normals.data(), GL_STATIC_DRAW);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
+        GLuint newIndexBO;
+        glGenBuffers(1, &newIndexBO);
+        // Why not bind to GL_ELEMENT_ARRAY_BUFFER?
+        // Because binding to GL_ELEMENT_ARRAY_BUFFER attaches the EBO to the currently bound VAO, which might stomp somebody else's state.
+        glBindBuffer(GL_ARRAY_BUFFER, newIndexBO);
+        glBufferData(GL_ARRAY_BUFFER, 2 * 3 * sizeof(int), newIndices, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-            newMesh.NormalBO = newNormalBO;
-        }
-
-        if (meshToAdd.indices.empty())
-        {
-            // should never happen
-            newMesh.IndexBO = 0;
-        }
-        else
-        {
-            GLuint newIndexBO;
-            glGenBuffers(1, &newIndexBO);
-            // Why not bind to GL_ELEMENT_ARRAY_BUFFER?
-            // Because binding to GL_ELEMENT_ARRAY_BUFFER attaches the EBO to the currently bound VAO, which might stomp somebody else's state.
-            glBindBuffer(GL_ARRAY_BUFFER, newIndexBO);
-            glBufferData(GL_ARRAY_BUFFER, meshToAdd.indices.size() * sizeof(meshToAdd.indices[0]), meshToAdd.indices.data(), GL_STATIC_DRAW);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-            newMesh.IndexBO = newIndexBO;
-        }
+        newMesh.IndexBO = newIndexBO;
 
         // Hook up VAO
-        {
-            GLuint newMeshVAO;
-            glGenVertexArrays(1, &newMeshVAO);
+        GLuint newMeshVAO;
+        glGenVertexArrays(1, &newMeshVAO);
 
-            glBindVertexArray(newMeshVAO);
+        glBindVertexArray(newMeshVAO);
 
-            if (newMesh.PositionBO)
-            {
-                glBindBuffer(GL_ARRAY_BUFFER, newMesh.PositionBO);
-                glVertexAttribPointer(SCENE_POSITION_ATTRIB_LOCATION, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
-                glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, newMesh.PositionBO);
+        glVertexAttribPointer(SCENE_POSITION_ATTRIB_LOCATION, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-                glEnableVertexAttribArray(SCENE_POSITION_ATTRIB_LOCATION);
-            }
+        glEnableVertexAttribArray(SCENE_POSITION_ATTRIB_LOCATION);
 
-            if (newMesh.TexCoordBO)
-            {
-                glBindBuffer(GL_ARRAY_BUFFER, newMesh.TexCoordBO);
-                glVertexAttribPointer(SCENE_TEXCOORD_ATTRIB_LOCATION, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
-                glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newMesh.IndexBO);
 
-                glEnableVertexAttribArray(SCENE_TEXCOORD_ATTRIB_LOCATION);
-            }
+        glBindVertexArray(0);
 
-            if (newMesh.NormalBO)
-            {
-                glBindBuffer(GL_ARRAY_BUFFER, newMesh.NormalBO);
-                glVertexAttribPointer(SCENE_NORMAL_ATTRIB_LOCATION, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
-                glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-                glEnableVertexAttribArray(SCENE_NORMAL_ATTRIB_LOCATION);
-            }
-
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newMesh.IndexBO);
-
-            glBindVertexArray(0);
-
-            newMesh.MeshVAO = newMeshVAO;
-        }
-
-        // split mesh into draw calls with different materials
-        int numFaces = (int)meshToAdd.indices.size() / 3;
-        int currMaterialFirstFaceIndex = 0;
-        for (int faceIdx = 0; faceIdx < numFaces; faceIdx++)
-        {
-            bool isLastFace = faceIdx + 1 == numFaces;
-            bool isNextFaceDifferent = isLastFace || meshToAdd.material_ids[faceIdx + 1] != meshToAdd.material_ids[faceIdx];
-            if (isNextFaceDifferent)
-            {
-                GLDrawElementsIndirectCommand currDrawCommand;
-                currDrawCommand.count = ((faceIdx + 1) - currMaterialFirstFaceIndex) * 3;
-                currDrawCommand.primCount = 1;
-                currDrawCommand.firstIndex = currMaterialFirstFaceIndex * 3;
-                currDrawCommand.baseVertex = 0;
-                currDrawCommand.baseInstance = 0;
-
-                uint32_t currMaterialID = newMaterialIDs[meshToAdd.material_ids[faceIdx]];
-
-                newMesh.DrawCommands.push_back(currDrawCommand);
-                newMesh.MaterialIDs.push_back(currMaterialID);
-
-                currMaterialFirstFaceIndex = faceIdx + 1;
-            }
-        }
+        newMesh.MeshVAO = newMeshVAO;
 
         uint32_t newMeshID = scene->Meshes.insert(newMesh);
-
         if (loadedMeshIDs)
         {
             loadedMeshIDs->push_back(newMeshID);
