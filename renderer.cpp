@@ -97,7 +97,7 @@ void Renderer::Render()
         glEnable(GL_DEPTH_TEST);
 
         glBindVertexArray(mScene->newMeshVAO);
-        glDrawElementsBaseVertex(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, 0);
+        glDrawElementsBaseVertex(GL_TRIANGLES, NUMINDICES, GL_UNSIGNED_INT, 0, 0);
         
         glBindVertexArray(0);
  

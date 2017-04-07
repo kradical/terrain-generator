@@ -17,22 +17,34 @@ void Simulation::Init(Scene* scene)
 {
     mScene = scene;
 
-    float newVertices[4][3]  = {
-        {-10.0, 0.0, -10.0}, 
-        {10.0, 0.0, -10.0}, 
-        {10.0, 0.0, 10.0}, 
-        {-10.0, 0.0, 10.0}
+    float newVertices[NUMVERTICES][3]  = {
+        { -10.0, 0.0, -10.0 }, //0 
+        { 10.0, 0.0, -10.0 }, //1
+        { 10.0, 0.0, 10.0 }, //2
+        { -10.0, 0.0, 10.0 }, //3
+        { -10.0, 0.0, 20.0 }, //4
+        { 10.0, 0.0, 20.0 }, // 5
+        { 10.0, 0.0, 30.0 }, // 6
+        { -10.0, 0.0, 30.0 }, // 7
+        { -10.0, 0.0, 40.0 }, // 8
+        { 10.0, 0.0, 40.0 }, // 9
     };
 
-    int newIndices[6] = {
+    int newIndices[NUMINDICES] = {
         0, 1, 2, 
-        0, 2, 3
+        0, 2, 3,
+        2, 3, 4,
+        2, 4, 5,
+        4, 5, 6,
+        4, 6, 7,
+        6, 7, 8,
+        6, 8, 9,
     };
 
     GLuint newPositionBO;
     glGenBuffers(1, &newPositionBO);
     glBindBuffer(GL_ARRAY_BUFFER, newPositionBO);
-    glBufferData(GL_ARRAY_BUFFER, 4 * 3 * sizeof(float), newVertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, NUMVERTICES * 3 * sizeof(float), newVertices, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     GLuint newIndexBO;
@@ -40,7 +52,7 @@ void Simulation::Init(Scene* scene)
     // Why not bind to GL_ELEMENT_ARRAY_BUFFER?
     // Because binding to GL_ELEMENT_ARRAY_BUFFER attaches the EBO to the currently bound VAO, which might stomp somebody else's state.
     glBindBuffer(GL_ARRAY_BUFFER, newIndexBO);
-    glBufferData(GL_ARRAY_BUFFER, 2 * 3 * sizeof(int), newIndices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, NUMINDICES * sizeof(int), newIndices, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // Hook up VAO

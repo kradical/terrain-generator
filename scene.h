@@ -1,5 +1,8 @@
 #pragma once
 
+#define NUMVERTICES 10
+#define NUMINDICES 24
+
 #include "opengl.h"
 #include "packed_freelist.h"
 
