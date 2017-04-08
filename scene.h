@@ -84,6 +84,7 @@ public:
     Camera MainCamera;
 
     GLuint newMeshVAO;
+    GLuint waterMapTO;
 
     void Init();
 };

@@ -79,6 +79,7 @@ void Renderer::Render()
         glUseProgram(*mSceneSP);
 
         GLint SCENE_MODELVIEWPROJECTION_UNIFORM_LOCATION = glGetUniformLocation(*mSceneSP, "ModelViewProjection");
+        GLint SCENE_WATER_MAP_UNIFORM_LOCATION = glGetUniformLocation(*mSceneSP, "WaterMap");
 
         const Camera& mainCamera = mScene->MainCamera;
 
@@ -90,6 +91,10 @@ void Renderer::Render()
         glm::mat4 worldProjection = viewProjection * worldView;
         glm::mat4 modelViewProjection = worldProjection;
         glProgramUniformMatrix4fv(*mSceneSP, SCENE_MODELVIEWPROJECTION_UNIFORM_LOCATION, 1, GL_FALSE, value_ptr(modelViewProjection));
+
+        glActiveTexture(GL_TEXTURE0 + SCENE_WATER_MAP_TEXTURE_BINDING);
+        glProgramUniform1i(*mSceneSP, SCENE_WATER_MAP_UNIFORM_LOCATION, SCENE_WATER_MAP_TEXTURE_BINDING);
+        glBindTexture(GL_TEXTURE_2D, mScene->waterMapTO);
 
         glBindFramebuffer(GL_FRAMEBUFFER, mBackbufferFBO);
         glViewport(0, 0, mBackbufferWidth, mBackbufferHeight);

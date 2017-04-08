@@ -11,6 +11,8 @@
 
 #include "preamble.glsl"
 
+#include "stb_image.h"
+
 #include <glm/gtc/type_ptr.hpp>
 
 #include <SDL2/SDL.h>
@@ -73,6 +75,30 @@ void Simulation::Init(Scene* scene)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newIndexBO);
 
     mScene->newMeshVAO = newMeshVAO;
+
+    // Set up water texture object
+    std::string diffuse_texname_full = "assets/water.tga";
+    int x, y, comp;
+    stbi_set_flip_vertically_on_load(1);
+    stbi_uc* pixels = stbi_load(diffuse_texname_full.c_str(), &x, &y, &comp, 4);
+    stbi_set_flip_vertically_on_load(0);
+
+    if (!pixels) {
+        fprintf(stderr, "stbi_load(%s): %s\n", diffuse_texname_full.c_str(), stbi_failure_reason());
+    } else {
+        float maxAnisotropy;
+        glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy);
+
+        glGenTextures(1, &mScene->waterMapTO);
+        glBindTexture(GL_TEXTURE_2D, mScene->waterMapTO);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        stbi_image_free(pixels);
+    }
 
     Camera mainCamera;
     mainCamera.Eye = glm::vec3(5.0f);
