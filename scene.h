@@ -1,7 +1,9 @@
 #pragma once
 
-#define NUMVERTICES 1875
-#define NUMINDICES 3456
+#define HEIGHT 100
+#define WIDTH 100
+#define NUMVERTICES 30000 // width * height * 3
+#define NUMINDICES 58806 // (widht - 1) * (height - 1) * 6
 
 #include "opengl.h"
 #include "packed_freelist.h"

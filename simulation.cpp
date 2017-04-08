@@ -20,60 +20,34 @@ void Simulation::Init(Scene* scene)
 {
     mScene = scene;
 
-    PerlinNoise pn = PerlinNoise(0.1, 0.5, 10.0, 1, 1 ); // double _persistence, double _frequency, double _amplitude, int _octaves, int _randomseed
+    // double _persistence, double _frequency, double _amplitude, int _octaves, int _randomseed
+    PerlinNoise pn = PerlinNoise(0.1, 0.1, 15.0, 1, 0); 
 
-
-    int width = 25;
-    int height = 25;
-
-    float* newVertices = new float[2000];
-    int index = 0;
-    for (int y=0; y<=height-1; y++)
-    {
-        for (int x=0 ; x<=width-1; x++)
-        {
-            newVertices[index]   = (float)x;
-            //std::cout << newVertices[index] << " ";
-            newVertices[index+1] = pn.GetHeight(x,y);
-            //std::cout << newVertices[index+1] << " ";
-            newVertices[index+2] = (float)y;
-            //std::cout << newVertices[index+2] << std::endl;
-            index += 3;
+    float vertices[HEIGHT][WIDTH][3];
+    for (int y = 0; y < HEIGHT; y++) {
+        for (int x = 0 ; x < WIDTH; x++) {
+            vertices[y][x][0] = (float)x;
+            vertices[y][x][1] = pn.GetHeight(x,y);
+            vertices[y][x][2] = (float)y;
         }
     }
 
-    int numV = index;
-    std::cout << "Vertices: " << numV << std::endl;
-
-    index = 0;
-    int* newIndices = new int[20000];
-    int row = width;
-
-    for(int w=0; w<width-1; w++){
-        for(int h=0; h<height-1; h++){
-            newIndices[index] = h + (w*row);
-            //std::cout << newIndices[index] << " ";
-            newIndices[index+1] = h + 1 + (w*row);
-            //std::cout << newIndices[index+1] << " ";
-            newIndices[index+2] = h + row + (w*row);
-            //std::cout << newIndices[index+2] << std::endl;
-
-            newIndices[index+3] = h + 1 + (w*row);
-            //std::cout << newIndices[index+3] << " ";
-            newIndices[index+4] = h + row + (w*row);
-            //std::cout << newIndices[index+4] << " ";
-            newIndices[index+5] = h + 1 + (w*row) + row;
-            //std::cout << newIndices[index+5] << std::endl;
-            index += 6;
+    int indices[WIDTH - 1][HEIGHT - 1][6];
+    for(int w = 0; w < WIDTH - 1; w++) {
+        for(int h = 0; h < HEIGHT - 1; h++) {
+            indices[w][h][0] = h + (w * WIDTH);
+            indices[w][h][1] = h + 1 + (w * WIDTH);
+            indices[w][h][2] = h + WIDTH + (w * WIDTH);
+            indices[w][h][3] = h + 1 + (w * WIDTH);
+            indices[w][h][4] = h + WIDTH + (w * WIDTH);
+            indices[w][h][5] = h + 1 + (w * WIDTH) + WIDTH;
         }
     }
-    int numI = index;
-    std::cout << "Indicies: " << numI << std::endl;
 
     GLuint newPositionBO;
     glGenBuffers(1, &newPositionBO);
     glBindBuffer(GL_ARRAY_BUFFER, newPositionBO);
-    glBufferData(GL_ARRAY_BUFFER, numV * sizeof(float), newVertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, NUMVERTICES * sizeof(float), vertices, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     GLuint newIndexBO;
@@ -81,7 +55,7 @@ void Simulation::Init(Scene* scene)
     // Why not bind to GL_ELEMENT_ARRAY_BUFFER?
     // Because binding to GL_ELEMENT_ARRAY_BUFFER attaches the EBO to the currently bound VAO, which might stomp somebody else's state.
     glBindBuffer(GL_ARRAY_BUFFER, newIndexBO);
-    glBufferData(GL_ARRAY_BUFFER, numI * sizeof(int), newIndices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, NUMINDICES * sizeof(int), indices, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // Hook up VAO
