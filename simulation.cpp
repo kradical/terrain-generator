@@ -107,8 +107,11 @@ void Simulation::Init(Scene* scene)
     mainCamera.Up = glm::vec3(0.0f, 1.0f, 0.0f);
     mainCamera.FovY = glm::radians(70.0f);
     mScene->MainCamera = mainCamera;
-
     mScene->MainCamera.isManual = true;
+
+    //Create Bezier Curve
+    glm::vec3* tmpPoints = new glm::vec3(0.0f,0.0f,0.0f);
+    mScene->MainCamera.bezierCurve = BezierCurve(1, tmpPoints);
 }
 
 void Simulation::HandleEvent(const SDL_Event& ev)
@@ -160,6 +163,7 @@ void Simulation::Update(float deltaTime)
                 NULL,
                 deltaTime,
                 5.0f, // eye_speed
+                mScene,
                 0
         );
     }

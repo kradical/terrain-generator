@@ -57,6 +57,7 @@ void flythrough_camera_update_automatic(
     float view[16],
     float delta_time_seconds,
     float eye_speed,
+    Scene* scene,
     unsigned int flags);
 
 // Utility for producing a look-to matrix without having to update a camera.
@@ -82,6 +83,8 @@ extern "C" {
 #include <math.h>
 #include <assert.h>
 
+#include "scene.h"
+
 void flythrough_camera_update_automatic(
     float eye[3],
     float look[3],
@@ -89,13 +92,13 @@ void flythrough_camera_update_automatic(
     float view[16],
     float delta_time_seconds,
     float eye_speed,
+    Scene* scene,
     unsigned int flags){
 
-    eye[0] = eye[0] + 0.01f/eye_speed;
-
-    look[0] = 0.0f - eye[0];
-    look[1] = 0.0f - eye[1];
-    look[2] = 0.0f - eye[2];
+    glm::vec3 Pos = scene->MainCamera.bezierCurve.GetNextValue();
+    eye[0] = Pos[0];
+    eye[1] = Pos[1];
+    eye[2] = Pos[2];
 
     //flythrough_camera_look_to(eye, look, up, view, flags);
 }

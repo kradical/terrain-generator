@@ -8,6 +8,8 @@
 #include "opengl.h"
 #include "packed_freelist.h"
 
+#include "BezierCurve.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
@@ -69,6 +71,7 @@ struct Camera
     glm::vec3 Up;
 
     bool isManual;
+    BezierCurve bezierCurve;
 
     // Projection
     float FovY;
