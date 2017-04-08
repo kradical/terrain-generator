@@ -107,6 +107,8 @@ void Simulation::Init(Scene* scene)
     mainCamera.Up = glm::vec3(0.0f, 1.0f, 0.0f);
     mainCamera.FovY = glm::radians(70.0f);
     mScene->MainCamera = mainCamera;
+
+    mScene->MainCamera.isManual = true;
 }
 
 void Simulation::HandleEvent(const SDL_Event& ev)
@@ -125,28 +127,49 @@ void Simulation::Update(float deltaTime)
     int mx, my;
     Uint32 mouse = SDL_GetMouseState(&mx, &my);
 
-    if ((mouse & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0)
+    bool* isManual = &mScene->MainCamera.isManual;
+
+    if (mScene->MainCamera.isManual == true)
     {
-        flythrough_camera_update(
-            value_ptr(mScene->MainCamera.Eye),
-            value_ptr(mScene->MainCamera.Look),
-            value_ptr(mScene->MainCamera.Up),
-            NULL,
-            deltaTime,
-            5.0f, // eye_speed
-            0.1f, // degrees_per_cursor_move
-            80.0f, // max_pitch_rotation_degrees
-            mDeltaMouseX, mDeltaMouseY,
-            keyboard[SDL_SCANCODE_W], keyboard[SDL_SCANCODE_A], keyboard[SDL_SCANCODE_S], keyboard[SDL_SCANCODE_D],
-            keyboard[SDL_SCANCODE_SPACE], keyboard[SDL_SCANCODE_LCTRL],
-            0);
+        if ((mouse & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0)
+        {
+            flythrough_camera_update_manual(
+                value_ptr(mScene->MainCamera.Eye),
+                value_ptr(mScene->MainCamera.Look),
+                value_ptr(mScene->MainCamera.Up),
+                NULL,
+                deltaTime,
+                5.0f, // eye_speed
+                0.1f, // degrees_per_cursor_move
+                80.0f, // max_pitch_rotation_degrees
+                mDeltaMouseX, mDeltaMouseY,
+                keyboard[SDL_SCANCODE_W], 
+                keyboard[SDL_SCANCODE_A], 
+                keyboard[SDL_SCANCODE_S], 
+                keyboard[SDL_SCANCODE_D],
+                keyboard[SDL_SCANCODE_SPACE], 
+                keyboard[SDL_SCANCODE_LCTRL],
+                0
+            );
+        }
+    } else {
+        flythrough_camera_update_automatic(
+                value_ptr(mScene->MainCamera.Eye),
+                value_ptr(mScene->MainCamera.Look),
+                value_ptr(mScene->MainCamera.Up),
+                NULL,
+                deltaTime,
+                5.0f, // eye_speed
+                0
+        );
     }
 
     mDeltaMouseX = 0;
     mDeltaMouseY = 0;
 
-    if (ImGui::Begin("Example GUI Window"))
+    if (ImGui::Begin("GUI Window"))
     {
+        ImGui::Checkbox("Manual FlyThrough", isManual);
         ImGui::Text("Mouse Pos: (%d, %d)", mx, my);
     }
     ImGui::End();

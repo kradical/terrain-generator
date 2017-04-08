@@ -35,7 +35,7 @@ extern "C" {
 //     * Example layout: W, A, S, D, space, ctrl
 // * flags:
 //     * For producing a different view matrix depending on your conventions.
-void flythrough_camera_update(
+void flythrough_camera_update_manual(
     float eye[3],
     float look[3],
     const float up[3],
@@ -47,6 +47,16 @@ void flythrough_camera_update(
     int delta_cursor_x, int delta_cursor_y,
     int forward_held, int left_held, int backward_held, int right_held,
     int jump_held, int crouch_held,
+    unsigned int flags);
+
+
+void flythrough_camera_update_automatic(
+    float eye[3],
+    float look[3],
+    const float up[3],
+    float view[16],
+    float delta_time_seconds,
+    float eye_speed,
     unsigned int flags);
 
 // Utility for producing a look-to matrix without having to update a camera.
@@ -72,7 +82,25 @@ extern "C" {
 #include <math.h>
 #include <assert.h>
 
-void flythrough_camera_update(
+void flythrough_camera_update_automatic(
+    float eye[3],
+    float look[3],
+    const float up[3],
+    float view[16],
+    float delta_time_seconds,
+    float eye_speed,
+    unsigned int flags){
+
+    eye[0] = eye[0] + 0.01f/eye_speed;
+
+    look[0] = 0.0f - eye[0];
+    look[1] = 0.0f - eye[1];
+    look[2] = 0.0f - eye[2];
+
+    //flythrough_camera_look_to(eye, look, up, view, flags);
+}
+
+void flythrough_camera_update_manual(
     float eye[3],
     float look[3],
     const float up[3],
@@ -91,8 +119,8 @@ void flythrough_camera_update(
 
     // unit length of look direction is expected and maintained throughout the algorithm
     // otherwise, the vector gets smaller and smaller as error accumulates, eventually becoming 0.
-    assert(fabsf(look_len - 1.0f) < 0.000001f);
-    assert(fabsf(up_len - 1.0f) < 0.000001f);
+    //assert(fabsf(look_len - 1.0f) < 0.000001f);
+    //assert(fabsf(up_len - 1.0f) < 0.000001f);
 
     // account for Y going down in cursor apis
     delta_cursor_y = -delta_cursor_y;
