@@ -1,7 +1,7 @@
 #pragma once
 
-#define NUMVERTICES 10
-#define NUMINDICES 24
+#define NUMVERTICES 1875
+#define NUMINDICES 3456
 
 #include "opengl.h"
 #include "packed_freelist.h"
