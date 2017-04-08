@@ -68,6 +68,8 @@ struct Camera
     glm::vec3 Look;
     glm::vec3 Up;
 
+    bool isManual;
+
     // Projection
     float FovY;
 };
