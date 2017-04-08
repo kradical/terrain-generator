@@ -1,11 +1,12 @@
 #include "scene.h"
-
+#include "PerlinNoise.h"
 #include "preamble.glsl"
 
 #include "tiny_obj_loader.h"
 #include "stb_image.h"
 
 #include <map>
+#include <iostream>
 
 void Scene::Init()
 {
@@ -15,6 +16,94 @@ void Scene::Init()
     Meshes = packed_freelist<Mesh>(512);
     Transforms = packed_freelist<Transform>(4096);
     Instances = packed_freelist<Instance>(4096);
+}
+
+void Scene::InitVertices() {
+    // double _persistence, double _frequency, double _amplitude, int _octaves, int _randomseed
+    PerlinNoise pn = PerlinNoise(0.1, 0.1, 30.0, 1, 0);
+
+    int min = 0;
+    int max = 0;
+
+    float vertices[HEIGHT][WIDTH][3];
+    for (int y = 0; y < HEIGHT; y++) {
+        for (int x = 0 ; x < WIDTH; x++) {
+            float height = pn.GetHeight(x, y);
+
+            vertices[y][x][0] = (float)x;
+            vertices[y][x][1] = height;
+            vertices[y][x][2] = (float)y;
+
+            if (height > max) max = height;
+            if (height < min) min = height;
+        }
+    }
+
+    std::cout << "min: " << min << std::endl;
+    std::cout << "max: " << max << std::endl;
+
+    int indices[WIDTH - 1][HEIGHT - 1][6];
+    for(int w = 0; w < WIDTH - 1; w++) {
+        for(int h = 0; h < HEIGHT - 1; h++) {
+            indices[w][h][0] = h + (w * WIDTH);
+            indices[w][h][1] = h + 1 + (w * WIDTH);
+            indices[w][h][2] = h + WIDTH + (w * WIDTH);
+            indices[w][h][3] = h + 1 + (w * WIDTH);
+            indices[w][h][4] = h + WIDTH + (w * WIDTH);
+            indices[w][h][5] = h + 1 + (w * WIDTH) + WIDTH;
+        }
+    }
+
+    GLuint newPositionBO;
+    glGenBuffers(1, &newPositionBO);
+    glBindBuffer(GL_ARRAY_BUFFER, newPositionBO);
+    glBufferData(GL_ARRAY_BUFFER, NUMVERTICES * sizeof(float), vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    GLuint newIndexBO;
+    glGenBuffers(1, &newIndexBO);
+    // Why not bind to GL_ELEMENT_ARRAY_BUFFER?
+    // Because binding to GL_ELEMENT_ARRAY_BUFFER attaches the EBO to the currently bound VAO, which might stomp somebody else's state.
+    glBindBuffer(GL_ARRAY_BUFFER, newIndexBO);
+    glBufferData(GL_ARRAY_BUFFER, NUMINDICES * sizeof(int), indices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // Hook up VAO
+    glGenVertexArrays(1, &newMeshVAO);
+
+    glBindVertexArray(newMeshVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, newPositionBO);
+    glVertexAttribPointer(SCENE_POSITION_ATTRIB_LOCATION, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glEnableVertexAttribArray(SCENE_POSITION_ATTRIB_LOCATION);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newIndexBO);
+}
+
+void Scene::InitTexture(GLuint* mapTO, std::string texname) {
+    int x, y, comp;
+    stbi_set_flip_vertically_on_load(1);
+    stbi_uc* pixels = stbi_load(texname.c_str(), &x, &y, &comp, 4);
+    stbi_set_flip_vertically_on_load(0);
+
+    if (!pixels) {
+        fprintf(stderr, "stbi_load(%s): %s\n", texname.c_str(), stbi_failure_reason());
+    } else {
+        float maxAnisotropy;
+        glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy);
+
+        glGenTextures(1, mapTO);
+        glBindTexture(GL_TEXTURE_2D, *mapTO);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        stbi_image_free(pixels);
+    }
 }
 
 void LoadMeshesFromFile(

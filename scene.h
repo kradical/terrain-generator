@@ -90,8 +90,14 @@ public:
 
     GLuint newMeshVAO;
     GLuint waterMapTO;
+    GLuint sandMapTO;
+    GLuint grassMapTO;
+    GLuint rockMapTO;
+    GLuint snowMapTO;
 
     void Init();
+    void InitVertices();
+    void InitTexture(GLuint* mapTO, std::string texname);
 };
 
 void LoadMeshesFromFile(

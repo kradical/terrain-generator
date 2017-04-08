@@ -80,6 +80,10 @@ void Renderer::Render()
 
         GLint SCENE_MODELVIEWPROJECTION_UNIFORM_LOCATION = glGetUniformLocation(*mSceneSP, "ModelViewProjection");
         GLint SCENE_WATER_MAP_UNIFORM_LOCATION = glGetUniformLocation(*mSceneSP, "WaterMap");
+        GLint SCENE_SAND_MAP_UNIFORM_LOCATION = glGetUniformLocation(*mSceneSP, "SandMap");
+        GLint SCENE_GRASS_MAP_UNIFORM_LOCATION = glGetUniformLocation(*mSceneSP, "GrassMap");
+        GLint SCENE_ROCK_MAP_UNIFORM_LOCATION = glGetUniformLocation(*mSceneSP, "RockMap");
+        GLint SCENE_SNOW_MAP_UNIFORM_LOCATION = glGetUniformLocation(*mSceneSP, "SnowMap");
 
         const Camera& mainCamera = mScene->MainCamera;
 
@@ -92,9 +96,26 @@ void Renderer::Render()
         glm::mat4 modelViewProjection = worldProjection;
         glProgramUniformMatrix4fv(*mSceneSP, SCENE_MODELVIEWPROJECTION_UNIFORM_LOCATION, 1, GL_FALSE, value_ptr(modelViewProjection));
 
+        // bind textures
         glActiveTexture(GL_TEXTURE0 + SCENE_WATER_MAP_TEXTURE_BINDING);
         glProgramUniform1i(*mSceneSP, SCENE_WATER_MAP_UNIFORM_LOCATION, SCENE_WATER_MAP_TEXTURE_BINDING);
         glBindTexture(GL_TEXTURE_2D, mScene->waterMapTO);
+        
+        glActiveTexture(GL_TEXTURE0 + SCENE_SAND_MAP_TEXTURE_BINDING);
+        glProgramUniform1i(*mSceneSP, SCENE_SAND_MAP_UNIFORM_LOCATION, SCENE_SAND_MAP_TEXTURE_BINDING);
+        glBindTexture(GL_TEXTURE_2D, mScene->sandMapTO);
+        
+        glActiveTexture(GL_TEXTURE0 + SCENE_GRASS_MAP_TEXTURE_BINDING);
+        glProgramUniform1i(*mSceneSP, SCENE_GRASS_MAP_UNIFORM_LOCATION, SCENE_GRASS_MAP_TEXTURE_BINDING);
+        glBindTexture(GL_TEXTURE_2D, mScene->grassMapTO);
+        
+        glActiveTexture(GL_TEXTURE0 + SCENE_ROCK_MAP_TEXTURE_BINDING);
+        glProgramUniform1i(*mSceneSP, SCENE_ROCK_MAP_UNIFORM_LOCATION, SCENE_ROCK_MAP_TEXTURE_BINDING);
+        glBindTexture(GL_TEXTURE_2D, mScene->rockMapTO);
+
+        glActiveTexture(GL_TEXTURE0 + SCENE_SNOW_MAP_TEXTURE_BINDING);
+        glProgramUniform1i(*mSceneSP, SCENE_SNOW_MAP_UNIFORM_LOCATION, SCENE_SNOW_MAP_TEXTURE_BINDING);
+        glBindTexture(GL_TEXTURE_2D, mScene->snowMapTO);
 
         glBindFramebuffer(GL_FRAMEBUFFER, mBackbufferFBO);
         glViewport(0, 0, mBackbufferWidth, mBackbufferHeight);
