@@ -35,7 +35,10 @@ void Simulation::Init(Scene* scene)
     mainCamera.FovY = glm::radians(70.0f);
     mScene->MainCamera = mainCamera;
     mScene->MainCamera.isManual = true;
-    mScene->MainCamera.isLocked = true;
+    mScene->MainCamera.isLocked = false;
+    mScene->MainCamera.autoIncrement = false;
+
+    mScene->MainCamera.movementSpeed = 0.1f;
 
     //Create Bezier Curve
     glm::vec3* CameraPoints = new glm::vec3[4];
@@ -75,8 +78,24 @@ void Simulation::Update(float deltaTime)
 
     bool* isManual = &mScene->MainCamera.isManual;
     bool* isLocked = &mScene->MainCamera.isLocked;
+    bool* autoIncrement = &mScene->MainCamera.autoIncrement;
+
+    float movementSpeed = mScene->MainCamera.movementSpeed;
+
+
     if(mScene->MainCamera.isLocked == true){
         mScene->MainCamera.lookAtCurve.T = mScene->MainCamera.cameraCurve.T;
+    }
+
+    if(mScene->MainCamera.autoIncrement == true){
+        mScene->MainCamera.lookAtCurve.T += movementSpeed/1000;
+        if(mScene->MainCamera.lookAtCurve.T >= 1.0f){
+            mScene->MainCamera.lookAtCurve.T = 0.0f;
+        }
+        mScene->MainCamera.cameraCurve.T += movementSpeed/1000;
+        if(mScene->MainCamera.cameraCurve.T >= 1.0f){
+            mScene->MainCamera.cameraCurve.T = 0.0f;
+        }
     }
 
     if (mScene->MainCamera.isManual == true)
@@ -122,7 +141,8 @@ void Simulation::Update(float deltaTime)
     {
         ImGui::Checkbox("Manual FlyThrough", isManual);
         ImGui::Checkbox("Lock Curves", isLocked);
-        ImGui::Text("Mouse Pos: (%d, %d)", mx, my);
+        ImGui::Checkbox("Auto Increment", autoIncrement);
+        ImGui::SliderFloat("Movement Speed", &mScene->MainCamera.movementSpeed, 0.0f, 1.0f);
         ImGui::SliderFloat("Camera Position", &mScene->MainCamera.cameraCurve.T, 0.0f, 1.0f);
         ImGui::SliderFloat("LookAt Position", &mScene->MainCamera.lookAtCurve.T, 0.0f, 1.0f);
     }

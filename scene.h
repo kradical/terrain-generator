@@ -73,6 +73,9 @@ struct Camera
 
     bool isManual;
     bool isLocked;
+    bool autoIncrement;
+
+    float movementSpeed;
 
     BezierCurve cameraCurve;
     BezierCurve lookAtCurve;
