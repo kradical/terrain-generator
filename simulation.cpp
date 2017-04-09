@@ -43,18 +43,18 @@ void Simulation::Init(Scene* scene)
     //Create Bezier Curve
     glm::vec3* CameraPoints = new glm::vec3[4];
     CameraPoints[0] = glm::vec3(100.0f,10.0f,0.0f);
-    CameraPoints[1] = glm::vec3(100.0f,100.0f,100.0f);
-    CameraPoints[2] = glm::vec3(0.0f,100.0f,100.0f);
+    CameraPoints[1] = glm::vec3(100.0f,30.0f,100.0f);
+    CameraPoints[2] = glm::vec3(0.0f,45.0f,100.0f);
     CameraPoints[3] = glm::vec3(0.0f,10.0f,0.0f);
 
     mScene->MainCamera.cameraCurve = BezierCurve(4, CameraPoints);
 
     //Create Bezier Curve
     glm::vec3* LookAtPoints = new glm::vec3[4];
-    LookAtPoints[0] = glm::vec3(30.0f,51.0f,60.0f);
-    LookAtPoints[1] = glm::vec3(200.0f,15.0f,90.0f);
-    LookAtPoints[2] = glm::vec3(65.0f,54.0f,54.0f);
-    LookAtPoints[3] = glm::vec3(0.0f,0.0f,0.0f);
+    LookAtPoints[0] = glm::vec3(30.0f,0.0f,60.0f);
+    LookAtPoints[1] = glm::vec3(57.0f,0.0f,90.0f);
+    LookAtPoints[2] = glm::vec3(65.0f,0.0f,54.0f);
+    LookAtPoints[3] = glm::vec3(100.0f,0.0f,80.0f);
 
     mScene->MainCamera.lookAtCurve = BezierCurve(4, LookAtPoints);
     std::cout << "Init Complete" << std::endl;
@@ -137,7 +137,7 @@ void Simulation::Update(float deltaTime)
     mDeltaMouseX = 0;
     mDeltaMouseY = 0;
 
-    if (ImGui::Begin("GUI Window"))
+    if (ImGui::Begin("Camera Control"))
     {
         ImGui::Checkbox("Manual FlyThrough", isManual);
         ImGui::Checkbox("Lock Curves", isLocked);
@@ -145,6 +145,19 @@ void Simulation::Update(float deltaTime)
         ImGui::SliderFloat("Movement Speed", &mScene->MainCamera.movementSpeed, 0.0f, 1.0f);
         ImGui::SliderFloat("Camera Position", &mScene->MainCamera.cameraCurve.T, 0.0f, 1.0f);
         ImGui::SliderFloat("LookAt Position", &mScene->MainCamera.lookAtCurve.T, 0.0f, 1.0f);
+    }
+    ImGui::End();
+
+    if (ImGui::Begin("Curve Control"))
+    {
+        ImGui::SliderFloat3("Camera Curve[0]", value_ptr(mScene->MainCamera.cameraCurve.Points[0]), 0.0f, 300.0f);
+        ImGui::SliderFloat3("Camera Curve[1]", value_ptr(mScene->MainCamera.cameraCurve.Points[1]), 0.0f, 300.0f);
+        ImGui::SliderFloat3("Camera Curve[2]", value_ptr(mScene->MainCamera.cameraCurve.Points[2]), 0.0f, 300.0f);
+        ImGui::SliderFloat3("Camera Curve[3]", value_ptr(mScene->MainCamera.cameraCurve.Points[3]), 0.0f, 300.0f);
+        ImGui::SliderFloat3("LookAt Curve[0]", value_ptr(mScene->MainCamera.lookAtCurve.Points[0]), 0.0f, 300.0f);
+        ImGui::SliderFloat3("LookAt Curve[1]", value_ptr(mScene->MainCamera.lookAtCurve.Points[1]), 0.0f, 300.0f);
+        ImGui::SliderFloat3("LookAt Curve[2]", value_ptr(mScene->MainCamera.lookAtCurve.Points[2]), 0.0f, 300.0f);
+        ImGui::SliderFloat3("LookAt Curve[3]", value_ptr(mScene->MainCamera.lookAtCurve.Points[3]), 0.0f, 300.0f);
     }
     ImGui::End();
 
