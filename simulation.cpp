@@ -35,10 +35,26 @@ void Simulation::Init(Scene* scene)
     mainCamera.FovY = glm::radians(70.0f);
     mScene->MainCamera = mainCamera;
     mScene->MainCamera.isManual = true;
+    mScene->MainCamera.isLocked = true;
 
     //Create Bezier Curve
-    glm::vec3* tmpPoints = new glm::vec3(0.0f,0.0f,0.0f);
-    mScene->MainCamera.bezierCurve = BezierCurve(1, tmpPoints);
+    glm::vec3* CameraPoints = new glm::vec3[4];
+    CameraPoints[0] = glm::vec3(100.0f,10.0f,0.0f);
+    CameraPoints[1] = glm::vec3(100.0f,100.0f,100.0f);
+    CameraPoints[2] = glm::vec3(0.0f,100.0f,100.0f);
+    CameraPoints[3] = glm::vec3(0.0f,10.0f,0.0f);
+
+    mScene->MainCamera.cameraCurve = BezierCurve(4, CameraPoints);
+
+    //Create Bezier Curve
+    glm::vec3* LookAtPoints = new glm::vec3[4];
+    LookAtPoints[0] = glm::vec3(30.0f,51.0f,60.0f);
+    LookAtPoints[1] = glm::vec3(200.0f,15.0f,90.0f);
+    LookAtPoints[2] = glm::vec3(65.0f,54.0f,54.0f);
+    LookAtPoints[3] = glm::vec3(0.0f,0.0f,0.0f);
+
+    mScene->MainCamera.lookAtCurve = BezierCurve(4, LookAtPoints);
+    std::cout << "Init Complete" << std::endl;
 }
 
 void Simulation::HandleEvent(const SDL_Event& ev)
@@ -58,6 +74,10 @@ void Simulation::Update(float deltaTime)
     Uint32 mouse = SDL_GetMouseState(&mx, &my);
 
     bool* isManual = &mScene->MainCamera.isManual;
+    bool* isLocked = &mScene->MainCamera.isLocked;
+    if(mScene->MainCamera.isLocked == true){
+        mScene->MainCamera.lookAtCurve.T = mScene->MainCamera.cameraCurve.T;
+    }
 
     if (mScene->MainCamera.isManual == true)
     {
@@ -101,7 +121,10 @@ void Simulation::Update(float deltaTime)
     if (ImGui::Begin("GUI Window"))
     {
         ImGui::Checkbox("Manual FlyThrough", isManual);
+        ImGui::Checkbox("Lock Curves", isLocked);
         ImGui::Text("Mouse Pos: (%d, %d)", mx, my);
+        ImGui::SliderFloat("Camera Position", &mScene->MainCamera.cameraCurve.T, 0.0f, 1.0f);
+        ImGui::SliderFloat("LookAt Position", &mScene->MainCamera.lookAtCurve.T, 0.0f, 1.0f);
     }
     ImGui::End();
 }

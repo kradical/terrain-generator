@@ -76,6 +76,7 @@ void flythrough_camera_look_to(
 
 #ifdef FLYTHROUGH_CAMERA_IMPLEMENTATION
 
+#include <iostream>
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
@@ -95,12 +96,18 @@ void flythrough_camera_update_automatic(
     Scene* scene,
     unsigned int flags){
 
-    glm::vec3 Pos = scene->MainCamera.bezierCurve.GetNextValue();
+    glm::vec3 Pos = scene->MainCamera.cameraCurve.GetNextValue();
     eye[0] = Pos[0];
     eye[1] = Pos[1];
     eye[2] = Pos[2];
 
-    //flythrough_camera_look_to(eye, look, up, view, flags);
+    glm::vec3 LookAt = scene->MainCamera.lookAtCurve.GetNextValue();
+
+    look[0] = LookAt[0] - eye[0];
+    look[1] = LookAt[1] - eye[1];
+    look[2] = LookAt[2] - eye[2];
+
+    flythrough_camera_look_to(eye, look, up, view, flags);
 }
 
 void flythrough_camera_update_manual(
