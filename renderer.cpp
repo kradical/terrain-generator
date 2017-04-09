@@ -22,6 +22,7 @@ void Renderer::Init(Scene* scene)
     mShaders.SetPreambleFile("preamble.glsl");
 
     mSceneSP = mShaders.AddProgramFromExts({ "scene.vert", "scene.frag" });
+    mSkyboxSP = mShaders.AddProgramFromExts({ "skybox.vert", "skybox.frag"});
 }
 
 void Renderer::Resize(int width, int height)
@@ -73,6 +74,49 @@ void Renderer::Render()
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
+    // render skybox
+    if (*mSkyboxSP) {
+        glDepthMask(GL_FALSE);
+        glUseProgram(*mSkyboxSP);
+
+        GLint SCENE_MODELVIEWPROJECTION_UNIFORM_LOCATION = glGetUniformLocation(*mSkyboxSP, "ModelViewProjection");
+        GLint SCENE_SKYBOX_MAP_UNIFORM_LOCATION = glGetUniformLocation(*mSkyboxSP, "Skybox");
+
+        const Camera& mainCamera = mScene->MainCamera;
+
+        glm::vec3 eye = mainCamera.Eye;
+        glm::vec3 up = mainCamera.Up;
+
+        glm::mat4 worldView = glm::mat4(glm::mat3(glm::lookAt(eye, eye + mainCamera.Look, up)));
+        glm::mat4 viewProjection = glm::perspective(mainCamera.FovY, (float)mBackbufferWidth / mBackbufferHeight, 0.01f, 100.0f);
+        glm::mat4 worldProjection = viewProjection * worldView;
+        glm::mat4 modelViewProjection = worldProjection;
+        glProgramUniformMatrix4fv(*mSkyboxSP, SCENE_MODELVIEWPROJECTION_UNIFORM_LOCATION, 1, GL_FALSE, value_ptr(modelViewProjection));
+
+        // bind texture
+        glActiveTexture(GL_TEXTURE0 + SCENE_SKYBOX_MAP_TEXTURE_BINDING);
+        glProgramUniform1i(*mSkyboxSP, SCENE_SKYBOX_MAP_UNIFORM_LOCATION, SCENE_SKYBOX_MAP_TEXTURE_BINDING);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, mScene->skyboxMapTO);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, mBackbufferFBO);
+        glViewport(0, 0, mBackbufferWidth, mBackbufferHeight);
+        glEnable(GL_FRAMEBUFFER_SRGB);
+        glEnable(GL_DEPTH_TEST);
+
+        glBindVertexArray(mScene->skyboxVAO);
+        glDrawElementsBaseVertex(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0, 0);
+        
+        glBindVertexArray(0);
+ 
+        glDepthMask(GL_TRUE);
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_FRAMEBUFFER_SRGB);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+        glUseProgram(0);
+    }
+
     // render scene
     if (*mSceneSP)
     {
@@ -91,7 +135,7 @@ void Renderer::Render()
         glm::vec3 up = mainCamera.Up;
 
         glm::mat4 worldView = glm::lookAt(eye, eye + mainCamera.Look, up);
-        glm::mat4 viewProjection = glm::perspective(mainCamera.FovY, (float)mBackbufferWidth / mBackbufferHeight, 0.01f, 100.0f);
+        glm::mat4 viewProjection = glm::perspective(mainCamera.FovY, (float)mBackbufferWidth / mBackbufferHeight, 0.01f, 200.0f);
         glm::mat4 worldProjection = viewProjection * worldView;
         glm::mat4 modelViewProjection = worldProjection;
         glProgramUniformMatrix4fv(*mSceneSP, SCENE_MODELVIEWPROJECTION_UNIFORM_LOCATION, 1, GL_FALSE, value_ptr(modelViewProjection));

@@ -20,19 +20,12 @@ void Simulation::Init(Scene* scene)
 {
     mScene = scene;
 
-    mScene->InitVertices();
-    mScene->InitTexture(&(mScene->waterMapTO), "assets/water.tga");
-    mScene->InitTexture(&(mScene->sandMapTO), "assets/sand.tga");
-    mScene->InitTexture(&(mScene->grassMapTO), "assets/grass.tga");
-    mScene->InitTexture(&(mScene->rockMapTO), "assets/rock.tga");
-    mScene->InitTexture(&(mScene->snowMapTO), "assets/snow.tga");
-
     Camera mainCamera;
-    mainCamera.Eye = glm::vec3(5.0f);
-    glm::vec3 target = glm::vec3(25.0f, 0.0f, 25.0f);
+    mainCamera.Eye = glm::vec3(0.0f, 13.0f, 0.0f);
+    glm::vec3 target = glm::vec3(1.0f, 13.0f, 1.0f);
     mainCamera.Look = normalize(target - mainCamera.Eye);
     mainCamera.Up = glm::vec3(0.0f, 1.0f, 0.0f);
-    mainCamera.FovY = glm::radians(70.0f);
+    mainCamera.FovY = glm::radians(45.0f);
     mScene->MainCamera = mainCamera;
     mScene->MainCamera.isManual = true;
     mScene->MainCamera.isLocked = false;
@@ -164,10 +157,9 @@ void Simulation::Update(float deltaTime)
     if (ImGui::Begin("Terrain Parameters")) {
         ImGui::SliderFloat("Persistence", &mScene->persistence, 0.01f, 10.0f);
         ImGui::SliderFloat("Frequency",  &mScene->frequency, 0.01f, 10.0f);
-        ImGui::SliderFloat("Amplitude",  &mScene->amplitude, 0.01f, 100.0f);
+        ImGui::SliderFloat("Amplitude",  &mScene->amplitude, 0.1f, 70.0f);
         ImGui::SliderInt("Octaves",  &mScene->octaves, 1, 12);
         ImGui::SliderInt("Randomseed",  &mScene->randomseed, 0, 100);
-        ImGui::SliderFloat("Inverse Distance Between Vertices", &mScene->distance, 0.1f, 10.0f);
     }
     ImGui::End();
 
@@ -175,14 +167,12 @@ void Simulation::Update(float deltaTime)
     if (fabs(mScene->oldPersistence - mScene->persistence) > epsilon ||
         fabs(mScene->oldFrequency - mScene->frequency) > epsilon ||
         fabs(mScene->oldAmplitude - mScene->amplitude) > epsilon ||
-        fabs(mScene->oldDistance - mScene->distance) > epsilon ||
         mScene->oldOctaves != mScene->octaves ||
         mScene->oldRandomseed != mScene->randomseed
         ) {
             mScene->oldPersistence = mScene->persistence; 
             mScene->oldFrequency = mScene->frequency;
             mScene->oldAmplitude = mScene->amplitude;
-            mScene->oldDistance = mScene->distance;
             mScene->oldOctaves = mScene->octaves;
             mScene->oldRandomseed = mScene->randomseed;
 

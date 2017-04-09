@@ -14,6 +14,7 @@ class Renderer
     ShaderSet mShaders;
 
     GLuint* mSceneSP;
+    GLuint* mSkyboxSP;
 
     int mBackbufferWidth;
     int mBackbufferHeight;

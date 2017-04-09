@@ -16,11 +16,22 @@ void Scene::Init()
     Meshes = packed_freelist<Mesh>(512);
     Transforms = packed_freelist<Transform>(4096);
     Instances = packed_freelist<Instance>(4096);
+
+    InitVertices();
+    InitTexture(&waterMapTO, "assets/water.tga");
+    InitTexture(&sandMapTO, "assets/sand.tga");
+    InitTexture(&grassMapTO, "assets/grass.tga");
+    InitTexture(&rockMapTO, "assets/rock.tga");
+    InitTexture(&snowMapTO, "assets/snow.tga");
+
+    InitSkyboxVertices();
+    InitSkyboxTextures();
 }
 
 void Scene::InitVertices() {
     if (pn != NULL) {
         delete pn;
+        pn = NULL;
     }
 
     pn = new PerlinNoise(persistence, frequency, amplitude, octaves, randomseed);
@@ -33,9 +44,9 @@ void Scene::InitVertices() {
         for (int x = 0 ; x < WIDTH; x++) {
             float height = pn->GetHeight(x, y);
 
-            vertices[y][x][0] = (float)x * (1.0 / distance);
+            vertices[y][x][0] = (float)x - (WIDTH / 2.0f);
             vertices[y][x][1] = height;
-            vertices[y][x][2] = (float)y * (1.0 / distance);
+            vertices[y][x][2] = (float)y - (HEIGHT / 2.0f);
 
             if (height > max) max = height;
             if (height < min) min = height;
@@ -174,6 +185,96 @@ void Scene::InitTexture(GLuint* mapTO, std::string texname) {
 
         stbi_image_free(pixels);
     }
+}
+
+void Scene::InitSkyboxVertices() {
+    float vertices[8][3] = {
+        { -1.0f, -1.0f, -1.0f },
+        { -1.0f, -1.0f, 1.0f },
+        { -1.0f, 1.0f, -1.0f },
+        { -1.0f, 1.0f, 1.0f },
+        { 1.0f, -1.0f, -1.0f },
+        { 1.0f, -1.0f, 1.0f },
+        { 1.0f, 1.0f, -1.0f },
+        { 1.0f, 1.0f, 1.0f },
+    };
+
+    int indices[36] {
+        0, 1, 2,
+        2, 3, 1,
+        1, 3, 7,
+        7, 5, 1,
+        1, 5, 0,
+        0, 4, 5,
+        0, 4, 2,
+        2, 4, 6,
+        2, 3, 6,
+        6, 7, 3,
+        7, 6, 4,
+        4, 7, 5,
+    };
+
+    GLuint newPositionBO;
+    glGenBuffers(1, &newPositionBO);
+    glBindBuffer(GL_ARRAY_BUFFER, newPositionBO);
+    glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(float), vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    GLuint newIndexBO;
+    glGenBuffers(1, &newIndexBO);
+    // Why not bind to GL_ELEMENT_ARRAY_BUFFER?
+    // Because binding to GL_ELEMENT_ARRAY_BUFFER attaches the EBO to the currently bound VAO, which might stomp somebody else's state.
+    glBindBuffer(GL_ARRAY_BUFFER, newIndexBO);
+    glBufferData(GL_ARRAY_BUFFER, 36 * sizeof(int), indices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // Hook up VAO
+    glGenVertexArrays(1, &skyboxVAO);
+
+    glBindVertexArray(skyboxVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, newPositionBO);
+    glVertexAttribPointer(SCENE_POSITION_ATTRIB_LOCATION, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glEnableVertexAttribArray(SCENE_POSITION_ATTRIB_LOCATION);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newIndexBO);
+}
+
+void Scene::InitSkyboxTextures() {
+    glGenTextures(1, &skyboxMapTO);
+    glActiveTexture(GL_TEXTURE0);
+
+    std::string cubeMapNames[6] = {
+        "assets/right.jpg",
+        "assets/left.jpg",
+        "assets/top.jpg",
+        "assets/bottom.jpg",
+        "assets/back.jpg",
+        "assets/front.jpg",
+    };
+
+    int width,height, comp;
+    stbi_uc* pixels;
+    
+    glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxMapTO);
+    for(GLuint i = 0; i < 6; i++) {
+        pixels = stbi_load(cubeMapNames[i].c_str(), &width, &height, &comp, 4);
+
+        if (!pixels) {
+            fprintf(stderr, "stbi_load(%s): %s\n", cubeMapNames[i].c_str(), stbi_failure_reason());
+        } else {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_SRGB8_ALPHA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+            stbi_image_free(pixels);
+        }
+    }
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
 void LoadMeshesFromFile(

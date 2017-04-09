@@ -17,7 +17,7 @@ void main()
         newPosition.y = -9.0;
     }
 
-    tex_coord = vec2(newPosition.x, newPosition.z);
+    tex_coord = vec2(newPosition.x / 5.0, newPosition.z / 5.0);
     normal = Normal;
     position = newPosition;
     gl_Position = ModelViewProjection * newPosition;
