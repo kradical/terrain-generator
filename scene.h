@@ -71,7 +71,10 @@ struct Camera
     glm::vec3 Up;
 
     bool isManual;
-    BezierCurve bezierCurve;
+    bool isLocked;
+
+    BezierCurve cameraCurve;
+    BezierCurve lookAtCurve;
 
     // Projection
     float FovY;
