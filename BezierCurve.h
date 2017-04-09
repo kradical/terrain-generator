@@ -11,8 +11,8 @@ public:
   BezierCurve();
   glm::vec3 GetNextValue() const;
   float T;
+  glm::vec3* Points;
 
 private:
-    glm::vec3* Points;
     int numPoints;
 };
