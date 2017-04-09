@@ -30,9 +30,9 @@ void Scene::InitVertices() {
         for (int x = 0 ; x < WIDTH; x++) {
             float height = pn.GetHeight(x, y);
 
-            vertices[y][x][0] = (float)x;
+            vertices[y][x][0] = (float)x / 2.0;
             vertices[y][x][1] = height;
-            vertices[y][x][2] = (float)y;
+            vertices[y][x][2] = (float)y / 2.0;
 
             if (height > max) max = height;
             if (height < min) min = height;
