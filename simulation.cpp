@@ -29,7 +29,7 @@ void Simulation::Init(Scene* scene)
 
     Camera mainCamera;
     mainCamera.Eye = glm::vec3(5.0f);
-    glm::vec3 target = glm::vec3(0.0f);
+    glm::vec3 target = glm::vec3(25.0f, 0.0f, 25.0f);
     mainCamera.Look = normalize(target - mainCamera.Eye);
     mainCamera.Up = glm::vec3(0.0f, 1.0f, 0.0f);
     mainCamera.FovY = glm::radians(70.0f);
