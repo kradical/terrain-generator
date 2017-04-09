@@ -54,10 +54,76 @@ void Scene::InitVertices() {
         }
     }
 
+    float normals[HEIGHT][WIDTH][3] = { 0 };
+    for(int w = 0; w < WIDTH - 1; w++) {
+        for(int h = 0; h < HEIGHT - 1; h++) {
+            int i0 = indices[w][h][0];
+            int i1 = indices[w][h][1];
+            int i2 = indices[w][h][2];
+
+            glm::vec3 v0 = glm::vec3((*vertices)[i0][0], (*vertices)[i0][1], (*vertices)[i0][2]);
+            glm::vec3 v1 = glm::vec3((*vertices)[i1][0], (*vertices)[i1][1], (*vertices)[i1][2]);
+            glm::vec3 v2 = glm::vec3((*vertices)[i2][0], (*vertices)[i2][1], (*vertices)[i2][2]);
+
+            glm::vec3 normal1 = glm::normalize(glm::cross(v1 - v0, v2 - v0));
+
+            (*normals)[i0][0] += normal1.x;
+            (*normals)[i0][1] += normal1.y;
+            (*normals)[i0][2] += normal1.z;
+
+            (*normals)[i1][0] += normal1.x;
+            (*normals)[i1][1] += normal1.y;
+            (*normals)[i1][2] += normal1.z;
+
+            (*normals)[i2][0] += normal1.x;
+            (*normals)[i2][1] += normal1.y;
+            (*normals)[i2][2] += normal1.z;
+
+            int i3 = indices[w][h][3];
+            int i4 = indices[w][h][4];
+            int i5 = indices[w][h][5];
+
+            glm::vec3 v3 = glm::vec3((*vertices)[i3][0], (*vertices)[i3][1], (*vertices)[i3][2]);
+            glm::vec3 v4 = glm::vec3((*vertices)[i4][0], (*vertices)[i4][1], (*vertices)[i4][2]);
+            glm::vec3 v5 = glm::vec3((*vertices)[i5][0], (*vertices)[i5][1], (*vertices)[i5][2]);
+
+            glm::vec3 normal2 = glm::normalize(glm::cross(v4 - v3, v5 - v3));
+
+            (*normals)[i3][0] += normal2.x;
+            (*normals)[i3][1] += normal2.y;
+            (*normals)[i3][2] += normal2.z;
+
+            (*normals)[i4][0] += normal2.x;
+            (*normals)[i4][1] += normal2.y;
+            (*normals)[i4][2] += normal2.z;
+
+            (*normals)[i5][0] += normal2.x;
+            (*normals)[i5][1] += normal2.y;
+            (*normals)[i5][2] += normal2.z;
+        }
+    }
+
+    for (int y = 0; y < HEIGHT; y++) {
+        for (int x = 0 ; x < WIDTH; x++) {
+            glm::vec3 v = glm::vec3(normals[y][x][0], normals[y][x][1], normals[y][x][2]);
+            glm::vec3 normal = glm::normalize(v);
+
+            normals[y][x][0] = normal.x; 
+            normals[y][x][1] = normal.y;
+            normals[y][x][2] = normal.z;
+        }
+    }
+
     GLuint newPositionBO;
     glGenBuffers(1, &newPositionBO);
     glBindBuffer(GL_ARRAY_BUFFER, newPositionBO);
     glBufferData(GL_ARRAY_BUFFER, NUMVERTICES * sizeof(float), vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    GLuint newNormalBO;
+    glGenBuffers(1, &newNormalBO);
+    glBindBuffer(GL_ARRAY_BUFFER, newNormalBO);
+    glBufferData(GL_ARRAY_BUFFER, NUMVERTICES * sizeof(float), normals, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     GLuint newIndexBO;
@@ -76,8 +142,12 @@ void Scene::InitVertices() {
     glBindBuffer(GL_ARRAY_BUFFER, newPositionBO);
     glVertexAttribPointer(SCENE_POSITION_ATTRIB_LOCATION, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
     glEnableVertexAttribArray(SCENE_POSITION_ATTRIB_LOCATION);
+
+    glBindBuffer(GL_ARRAY_BUFFER, newNormalBO);
+    glVertexAttribPointer(SCENE_NORMAL_ATTRIB_LOCATION, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glEnableVertexAttribArray(SCENE_NORMAL_ATTRIB_LOCATION);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newIndexBO);
 }

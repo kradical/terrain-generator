@@ -1,7 +1,11 @@
 layout(location = SCENE_POSITION_ATTRIB_LOCATION)
 in vec4 Position;
 
-out float height;
+layout(location = SCENE_NORMAL_ATTRIB_LOCATION)
+in vec3 Normal;
+
+out vec4 position;
+out vec3 normal;
 out vec2 tex_coord;
 
 uniform mat4 ModelViewProjection;
@@ -14,6 +18,7 @@ void main()
     }
 
     tex_coord = vec2(newPosition.x, newPosition.z);
-    height = newPosition.y;
+    normal = Normal;
+    position = newPosition;
     gl_Position = ModelViewProjection * newPosition;
 }
