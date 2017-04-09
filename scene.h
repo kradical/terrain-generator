@@ -102,6 +102,13 @@ public:
     float distance = 1.0;
     int octaves = 1;
     int randomseed = 0;
+    
+    float oldPersistence = 0.1; 
+    float oldFrequency = 0.1;
+    float oldAmplitude = 30.0;
+    float oldDistance = 1.0;
+    int oldOctaves = 1;
+    int oldRandomseed = 0;
 
     GLuint newMeshVAO;
     GLuint waterMapTO;

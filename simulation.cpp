@@ -162,16 +162,32 @@ void Simulation::Update(float deltaTime)
     ImGui::End();
 
     if (ImGui::Begin("Terrain Parameters")) {
-        ImGui::SliderFloat("PerlinNoise Persistence", &mScene->persistence, 0.01f, 10.0f);
-        ImGui::SliderFloat("PerlinNoise Frequency",  &mScene->frequency, 0.01f, 10.0f);
-        ImGui::SliderFloat("PerlinNoise Amplitude",  &mScene->amplitude, 0.01f, 100.0f);
-        ImGui::SliderInt("PerlinNoise Octaves",  &mScene->octaves, 1, 12);
-        ImGui::SliderInt("PerlinNoise Randomseed",  &mScene->randomseed, 0, 100);
+        ImGui::SliderFloat("Persistence", &mScene->persistence, 0.01f, 10.0f);
+        ImGui::SliderFloat("Frequency",  &mScene->frequency, 0.01f, 10.0f);
+        ImGui::SliderFloat("Amplitude",  &mScene->amplitude, 0.01f, 100.0f);
+        ImGui::SliderInt("Octaves",  &mScene->octaves, 1, 12);
+        ImGui::SliderInt("Randomseed",  &mScene->randomseed, 0, 100);
         ImGui::SliderFloat("Inverse Distance Between Vertices", &mScene->distance, 0.1f, 10.0f);
     }
     ImGui::End();
 
-    mScene->InitVertices();
+    float epsilon = 0.00001f;
+    if (fabs(mScene->oldPersistence - mScene->persistence) > epsilon ||
+        fabs(mScene->oldFrequency - mScene->frequency) > epsilon ||
+        fabs(mScene->oldAmplitude - mScene->amplitude) > epsilon ||
+        fabs(mScene->oldDistance - mScene->distance) > epsilon ||
+        mScene->oldOctaves != mScene->octaves ||
+        mScene->oldRandomseed != mScene->randomseed
+        ) {
+            mScene->oldPersistence = mScene->persistence; 
+            mScene->oldFrequency = mScene->frequency;
+            mScene->oldAmplitude = mScene->amplitude;
+            mScene->oldDistance = mScene->distance;
+            mScene->oldOctaves = mScene->octaves;
+            mScene->oldRandomseed = mScene->randomseed;
+
+            mScene->InitVertices();
+    }
 }
 
 void* Simulation::operator new(size_t sz)
