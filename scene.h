@@ -71,11 +71,11 @@ struct Camera
     glm::vec3 Look;
     glm::vec3 Up;
 
-    bool isManual;
-    bool isLocked;
-    bool autoIncrement;
+    bool isManual = false;
+    bool isLocked = true;
+    bool autoIncrement = true;
 
-    float movementSpeed;
+    float movementSpeed = 0.5f;
 
     BezierCurve cameraCurve;
     BezierCurve lookAtCurve;
@@ -100,13 +100,13 @@ public:
     float frequency = 0.1;
     float amplitude = 30.0;
     int octaves = 1;
-    int randomseed = 0;
+    int randomseed = 23;
     
     float oldPersistence = 0.1; 
     float oldFrequency = 0.1;
     float oldAmplitude = 30.0;
     int oldOctaves = 1;
-    int oldRandomseed = 0;
+    int oldRandomseed = 23;
 
     GLuint newMeshVAO;
     GLuint waterMapTO;

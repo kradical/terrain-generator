@@ -26,28 +26,25 @@ void Simulation::Init(Scene* scene)
     mainCamera.Look = normalize(target - mainCamera.Eye);
     mainCamera.Up = glm::vec3(0.0f, 1.0f, 0.0f);
     mainCamera.FovY = glm::radians(45.0f);
-    mScene->MainCamera = mainCamera;
-    mScene->MainCamera.isManual = true;
-    mScene->MainCamera.isLocked = false;
-    mScene->MainCamera.autoIncrement = false;
 
-    mScene->MainCamera.movementSpeed = 0.1f;
+    mScene->MainCamera = mainCamera;
+
 
     //Create Bezier Curve
     glm::vec3* CameraPoints = new glm::vec3[4];
-    CameraPoints[0] = glm::vec3(100.0f,10.0f,0.0f);
-    CameraPoints[1] = glm::vec3(100.0f,30.0f,100.0f);
-    CameraPoints[2] = glm::vec3(0.0f,45.0f,100.0f);
-    CameraPoints[3] = glm::vec3(0.0f,10.0f,0.0f);
+    CameraPoints[0] = glm::vec3(0.0f, 13.0f, 0.0f);
+    CameraPoints[1] = glm::vec3(WIDTH / 2.0f, 15.0f, HEIGHT / 2.0f);
+    CameraPoints[2] = glm::vec3(WIDTH / 2.0f, 20.0f, -HEIGHT / 2.0f);
+    CameraPoints[3] = glm::vec3(0.0f, 13.0f, 0.0f);
 
     mScene->MainCamera.cameraCurve = BezierCurve(4, CameraPoints);
 
     //Create Bezier Curve
     glm::vec3* LookAtPoints = new glm::vec3[4];
-    LookAtPoints[0] = glm::vec3(30.0f,0.0f,60.0f);
-    LookAtPoints[1] = glm::vec3(57.0f,0.0f,90.0f);
-    LookAtPoints[2] = glm::vec3(65.0f,0.0f,54.0f);
-    LookAtPoints[3] = glm::vec3(100.0f,0.0f,80.0f);
+    LookAtPoints[0] = glm::vec3(30.0f, 0.0f, 60.0f);
+    LookAtPoints[1] = glm::vec3(-57.0f, 0.0f, 90.0f);
+    LookAtPoints[2] = glm::vec3(-65.0f, 0.0f, 54.0f);
+    LookAtPoints[3] = glm::vec3(100.0f, 0.0f, 80.0f);
 
     mScene->MainCamera.lookAtCurve = BezierCurve(4, LookAtPoints);
     std::cout << "Init Complete" << std::endl;

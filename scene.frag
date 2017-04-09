@@ -16,9 +16,7 @@ float random(vec2 p){return fract(cos(dot(p,vec2(23.14069263277926,2.66514414269
 void main() {
     vec4 color;
 
-    float mindiv2 = 7.5;
-
-    float normalizedHeight = clamp(0.0, 1.0, (position.y + mindiv2) / 24.0); // [0, 1]
+    float normalizedHeight = clamp(0.0, 1.0, (position.y + 7.5) / 24.0); // [0, 1]
     float steepness = dot(normal, vec3(0, 1, 0));
 
     vec4 water = texture(WaterMap, tex_coord).rgba;
