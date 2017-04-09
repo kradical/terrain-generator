@@ -20,7 +20,7 @@ void Scene::Init()
 
 void Scene::InitVertices() {
     // double _persistence, double _frequency, double _amplitude, int _octaves, int _randomseed
-    PerlinNoise pn = PerlinNoise(0.1, 0.1, 30.0, 1, 0);
+    pn = PerlinNoise(0.1, 0.1, 30.0, 1, 0);
 
     int min = 0;
     int max = 0;

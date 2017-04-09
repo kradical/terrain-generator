@@ -5,6 +5,7 @@
 #define NUMVERTICES 120000 // width * height * 3
 #define NUMINDICES 237606 // (width - 1) * (height - 1) * 6
 
+#include "PerlinNoise.h"
 #include "opengl.h"
 #include "packed_freelist.h"
 
@@ -90,6 +91,8 @@ public:
     packed_freelist<Instance> Instances;
 
     Camera MainCamera;
+
+    PerlinNoise pn;
 
     GLuint newMeshVAO;
     GLuint waterMapTO;

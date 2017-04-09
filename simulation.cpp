@@ -127,6 +127,18 @@ void Simulation::Update(float deltaTime)
         ImGui::SliderFloat("LookAt Position", &mScene->MainCamera.lookAtCurve.T, 0.0f, 1.0f);
     }
     ImGui::End();
+
+    float persistence, frequency, amplitude;
+    int octaves, randomseed;
+
+    if (ImGui::Begin("Terrain Parameters")) {
+        ImGui::SliderFloat("PerlinNoise Persistence", &persistence, 0.0f, 10.0f);
+        ImGui::SliderFloat("PerlinNoise Frequency",  &frequency, 0.0f, 10.0f);
+        ImGui::SliderFloat("PerlinNoise Amplitude",  &amplitude, 0.0f, 10.0f);
+        ImGui::SliderInt("PerlinNoise Octaves",  &octaves, 0, 10);
+        ImGui::SliderInt("PerlinNoise Randomseed",  &randomseed, 0, 10);
+    }
+    ImGui::End();
 }
 
 void* Simulation::operator new(size_t sz)
