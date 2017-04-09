@@ -95,7 +95,13 @@ public:
 
     Camera MainCamera;
 
-    PerlinNoise pn;
+    PerlinNoise* pn;
+    float persistence = 0.1; 
+    float frequency = 0.1;
+    float amplitude = 30.0;
+    float distance = 1.0;
+    int octaves = 1;
+    int randomseed = 0;
 
     GLuint newMeshVAO;
     GLuint waterMapTO;

@@ -148,17 +148,17 @@ void Simulation::Update(float deltaTime)
     }
     ImGui::End();
 
-    float persistence, frequency, amplitude;
-    int octaves, randomseed;
-
     if (ImGui::Begin("Terrain Parameters")) {
-        ImGui::SliderFloat("PerlinNoise Persistence", &persistence, 0.0f, 10.0f);
-        ImGui::SliderFloat("PerlinNoise Frequency",  &frequency, 0.0f, 10.0f);
-        ImGui::SliderFloat("PerlinNoise Amplitude",  &amplitude, 0.0f, 10.0f);
-        ImGui::SliderInt("PerlinNoise Octaves",  &octaves, 0, 10);
-        ImGui::SliderInt("PerlinNoise Randomseed",  &randomseed, 0, 10);
+        ImGui::SliderFloat("PerlinNoise Persistence", &mScene->persistence, 0.01f, 10.0f);
+        ImGui::SliderFloat("PerlinNoise Frequency",  &mScene->frequency, 0.01f, 10.0f);
+        ImGui::SliderFloat("PerlinNoise Amplitude",  &mScene->amplitude, 0.01f, 100.0f);
+        ImGui::SliderInt("PerlinNoise Octaves",  &mScene->octaves, 1, 12);
+        ImGui::SliderInt("PerlinNoise Randomseed",  &mScene->randomseed, 0, 100);
+        ImGui::SliderFloat("Inverse Distance Between Vertices", &mScene->distance, 0.1f, 10.0f);
     }
     ImGui::End();
+
+    mScene->InitVertices();
 }
 
 void* Simulation::operator new(size_t sz)

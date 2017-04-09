@@ -19,8 +19,11 @@ void Scene::Init()
 }
 
 void Scene::InitVertices() {
-    // double _persistence, double _frequency, double _amplitude, int _octaves, int _randomseed
-    pn = PerlinNoise(0.1, 0.1, 30.0, 1, 0);
+    if (pn != NULL) {
+        delete pn;
+    }
+
+    pn = new PerlinNoise(persistence, frequency, amplitude, octaves, randomseed);
 
     int min = 0;
     int max = 0;
@@ -28,19 +31,16 @@ void Scene::InitVertices() {
     float vertices[HEIGHT][WIDTH][3];
     for (int y = 0; y < HEIGHT; y++) {
         for (int x = 0 ; x < WIDTH; x++) {
-            float height = pn.GetHeight(x, y);
+            float height = pn->GetHeight(x, y);
 
-            vertices[y][x][0] = (float)x / 2.0;
+            vertices[y][x][0] = (float)x * (1.0 / distance);
             vertices[y][x][1] = height;
-            vertices[y][x][2] = (float)y / 2.0;
+            vertices[y][x][2] = (float)y * (1.0 / distance);
 
             if (height > max) max = height;
             if (height < min) min = height;
         }
     }
-
-    std::cout << "min: " << min << std::endl;
-    std::cout << "max: " << max << std::endl;
 
     int indices[WIDTH - 1][HEIGHT - 1][6];
     for(int w = 0; w < WIDTH - 1; w++) {
