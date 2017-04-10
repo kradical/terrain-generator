@@ -1,5 +1,6 @@
 #pragma once
 
+// http://stackoverflow.com/questions/4753055/perlin-noise-generation-for-terrain
 class PerlinNoise
 {
 public:
