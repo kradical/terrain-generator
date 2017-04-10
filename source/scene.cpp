@@ -1,6 +1,6 @@
 #include "scene.h"
 #include "PerlinNoise.h"
-#include "preamble.glsl"
+#include "../shaders/preamble.glsl"
 
 #include "tiny_obj_loader.h"
 #include "stb_image.h"

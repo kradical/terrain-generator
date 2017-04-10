@@ -7,7 +7,7 @@
 #define FLYTHROUGH_CAMERA_IMPLEMENTATION
 #include "flythrough_camera.h"
 
-#include "preamble.glsl"
+#include "../shaders/preamble.glsl"
 
 #include "stb_image.h"
 

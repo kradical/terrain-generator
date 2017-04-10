@@ -4,7 +4,7 @@
 
 #include "imgui.h"
 
-#include "preamble.glsl"
+#include "../shaders/preamble.glsl"
 
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -19,10 +19,10 @@ void Renderer::Init(Scene* scene)
 
     // feel free to increase the GLSL version if your computer supports it
     mShaders.SetVersion("410");
-    mShaders.SetPreambleFile("preamble.glsl");
+    mShaders.SetPreambleFile("shaders/preamble.glsl");
 
-    mSceneSP = mShaders.AddProgramFromExts({ "scene.vert", "scene.frag" });
-    mSkyboxSP = mShaders.AddProgramFromExts({ "skybox.vert", "skybox.frag"});
+    mSceneSP = mShaders.AddProgramFromExts({ "shaders/scene.vert", "shaders/scene.frag" });
+    mSkyboxSP = mShaders.AddProgramFromExts({ "shaders/skybox.vert", "shaders/skybox.frag"});
 }
 
 void Renderer::Resize(int width, int height)

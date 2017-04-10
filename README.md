@@ -3,16 +3,32 @@
 ## CSC305 Project 3
 ### Dustin Bolink & Konrad Schultz
 
-There is a makefile included in this repository. This repository contains all the necessary assets to run.
-It also has a build and run script. 
+This repository contains all necessary assets to run. it has a script called run.sh to compile and run.
 
 Navigate to the root folder and try `$ ./run.sh`
 
-Your system must be using opengl 4 and have the sdl2 dev dependency in your includes.
+Your system must be using opengl 4 and have the sdl2 dev dependency in your system or user includes.
 
 See links for the [ubuntu ppa and instructions](https://www.phoronix.com/scan.php?page=news_item&px=Ubuntu-16.04-OI-Intel-GL-4.2), and [installing sdl2 dev package](https://wiki.libsdl.org/Installation).
 
 ### GUI and Navigation
-The gui contains a window for adjusting flythrough camera/look at path values, speed, and manual mode. 
-It also has a window for adjusting bezier curve points that the camera paths through. It also has a window 
-for adjusting terrain generation parameters.
+The gui contains a window for adjusting flythrough camera/look at path values, speed, and manual mode. It also has a window for adjusting bezier curve points that the camera paths through. It also has a window for adjusting terrain generation parameters.
+
+### Screenshots
+See the screenshots folder for screenshots.
+
+### Features
+This is a non-exhaustive list of features implemented:
+* An array of vertices to form a plane
+* Perlin noise to create a height map
+* Texture sampling and blending to color terrain
+* Calculated and used normals to blend based on terrain steepness
+* Bezier curve for camera position
+* Bezier curve for camera look at location
+* Parameterized perlin noise inputs
+* Parameterized Bezier curve points
+* Parameterized automatic flythrough vs. manual mode
+* Skybox for background
+
+Anything parameterized can be played with at runtime via the imgui windows.
+
