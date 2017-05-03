@@ -15,7 +15,10 @@ See links for the [ubuntu ppa and instructions](https://www.phoronix.com/scan.ph
 The gui contains a window for adjusting flythrough camera/look at path values, speed, and manual mode. It also has a window for adjusting bezier curve points that the camera paths through. It also has a window for adjusting terrain generation parameters.
 
 ### Screenshots
-See the screenshots folder for screenshots.
+![Screenshot1](https://raw.githubusercontent.com/kradical/terrain-generator/master/screenshots/Screenshot%20from%202017-04-09%2017-26-04.png)
+![Screenshot2](https://raw.githubusercontent.com/kradical/terrain-generator/master/screenshots/Screenshot%20from%202017-04-09%2017-26-13.png)
+![Screenshot3](https://raw.githubusercontent.com/kradical/terrain-generator/master/screenshots/Screenshot%20from%202017-04-09%2017-26-28.png)
+![Screenshot4](https://raw.githubusercontent.com/kradical/terrain-generator/master/screenshots/Screenshot%20from%202017-04-09%2017-26-45.png)
 
 ### Features
 This is a non-exhaustive list of features implemented:
@@ -28,7 +31,6 @@ This is a non-exhaustive list of features implemented:
 * Parameterized perlin noise inputs
 * Parameterized Bezier curve points
 * Parameterized automatic flythrough vs. manual mode
-* Skybox for background
+* Skybox
 
 Anything parameterized can be played with at runtime via the imgui windows.
-
